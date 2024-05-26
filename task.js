@@ -1,7 +1,8 @@
 export class Task {
-  constructor(id, category, status, description) {
+  constructor(id, category, done, description) {
     this.id = id;
-    this.status = false;
+    this.category = category;
+    this.done = false;
     this.description = description;
   }
 }

@@ -15,11 +15,11 @@ const port = process.env.PORT || 3001;
 //app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-app.get('api/tasks/category/{category}/{status}')
-{
-  const data = await fs.promises.readFile("tasks.json","utf-8");
-  const tasks = JSON.parse(data);
-}
+// app.get('api/tasks/category/{category}/{status}')
+// {
+//   const data = await fs.promises.readFile("tasks.json","utf-8");
+//   const tasks = JSON.parse(data);
+// }
 // API endpoint to return sample tasks (replace with actual logic)
 app.get('/api/tasks', async (req, res,next) => {
   try {
@@ -49,53 +49,98 @@ app.get('/api/tasks', async (req, res,next) => {
   //res.json(['Buy milk', 'Walk the dog']);
 });
 
-async function writeTask(task) {
-  try {
-    const data = await fs.promises.readFile('tasks.json', 'utf-8');
-    const tasks = JSON.parse(data);
-    tasks.push(task); // Add the new task
 
-    const jsonData = JSON.stringify(tasks, null, 2); // Stringify with indentation
-    await fs.promises.writeFile('tasks.json', jsonData);
-  } catch (error) {
-    console.error(error);
-    return false; // Indicate failure
+// Helper function to read tasks from JSON file
+async function readTasks() {
+  try
+  {
+    const data = await fs.promises.readFile('tasks.json', 'utf-8');
+    if(data)
+      return JSON.parse(data);
+    else
+      return [];
   }
-  return true; // Indicate success
+  catch(err)
+  {
+    console.log(err);
+  }
 }
+
+// Helper function to write tasks to JSON file
+async function writeTasks(tasks) {
+  const jsonData = JSON.stringify(tasks, null, 2);  
+  await fs.promises.writeFile('tasks.json', jsonData);
+}
+// async function writeTask(task) {
+//   try {
+//     const data = await fs.promises.readFile('tasks.json', 'utf-8');
+//     const tasks = JSON.parse(data);
+//     tasks.push(task); // Add the new task
+
+//     const jsonData = JSON.stringify(tasks, null, 2); // Stringify with indentation
+//     await fs.promises.writeFile('tasks.json', jsonData);
+//   } catch (error) {
+//     console.error(error);
+//     return false; // Indicate failure
+//   }
+//   return true; // Indicate success
+// }
 
 app.use(express.json());
 
-app.put('/api/tasks',async(req,res,next)=>
-  {
-    const done = req.params[0];
-      
-  });
+app.put('/api/tasks/:id', async (req, res, next) => {
+  const { id } = req.params;
+  const { done } = req.body;
 
-app.post('/api/tasks',async(req,res,next)=>
-{
-  const taskDto = req.body;
-  if (!taskDto || !taskDto.taskDescription) 
-  {
-    res.status(400).json({ message: 'Invalid task data' }); // Return an object with a message
+  if (done === undefined) {
+    res.status(400).json({ message: 'Invalid task data' });
+    return;
   }
 
-  const task = new Task(uuidv4(),taskDto.taskDescription); // Create Task object from DTO
-  const success = await writeTask(task);
+  try {
+    const tasks = await readTasks();
+    const taskIndex = tasks.findIndex(task => task.id === id);
 
-  if (success) {
+    if (taskIndex === -1) {
+      res.status(404).json({ message: 'Task not found' });
+      return;
+    }
+
+    tasks[taskIndex].done = done;
+    await writeTasks(tasks);
+    res.json(tasks[taskIndex]);
+  } catch (error) {
+    console.error('Error updating task:', error);
+    res.status(500).json({ message: 'Error updating task' });
+  }
+});
+
+// API endpoint to create a new task
+app.post('/api/tasks', async (req, res, next) => {
+  const taskDto = req.body;
+  if (!taskDto || !taskDto.description || !taskDto.category) {
+    res.status(400).json({ message: 'Invalid task data' });
+    return;
+  }
+
+  const task = new Task(uuidv4(), taskDto.category , false,taskDto.description); // Added default 'done' status
+  try {
+    const tasks = await readTasks();
+    tasks.push(task);    
+    await writeTasks(tasks);
     res.json(task);
-  } else {
-    res.status(500).json({ message: 'Error adding task'});
-  }  
-  });
+  } catch (error) {
+    console.error('Error adding task:', error);
+    res.status(500).json({ message: 'Error adding task' });
+  }
+});
 
 // Route for the main page
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname,  'index.html'));
 });
 
-)
+
 
 app.use(errorHandlingMW);
 

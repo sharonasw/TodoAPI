@@ -1,20 +1,14 @@
 [
   {
-    "id": "2f81dd89-d857-4c42-a512-767293174ae4",
-    "category":"pets",
-    "done":false,
-    "description": "buy dog"
+    "id": "05481666-140b-41d7-a5d5-fa2f5148a4cd",
+    "category": "pets",
+    "done": true,
+    "description": "2"
   },
   {
-    "id": "394aee9f-4680-413d-bae5-77a3d84e4336",
-    "category":"food",
-    "done":false,
-    "description": "eat an apple"
-  },
-  {
-    "id": "db800083-d798-4fd6-8ad2-bbdd1e725148",
-    "category":"food",
-    "done":false,
-    "description": "drink wine"
+    "id": "24eeb384-8d5e-4a89-9c0f-101bc72e5d26",
+    "category": "food",
+    "done": true,
+    "description": "3"
   }
 ]
