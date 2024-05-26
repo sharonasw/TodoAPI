@@ -1,14 +1,8 @@
 [
   {
-    "id": "05481666-140b-41d7-a5d5-fa2f5148a4cd",
-    "category": "pets",
-    "done": true,
-    "description": "2"
-  },
-  {
-    "id": "24eeb384-8d5e-4a89-9c0f-101bc72e5d26",
+    "id": "0bb9b12e-3958-4f5f-bec3-39f6556f784a",
     "category": "food",
-    "done": true,
-    "description": "3"
+    "done": false,
+    "description": "1"
   }
 ]
